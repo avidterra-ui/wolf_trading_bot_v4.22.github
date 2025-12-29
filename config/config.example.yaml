@@ -1,0 +1,143 @@
+# ============================================
+# WOLF TRADING BOT v4.1 - EXAMPLE CONFIGURATION
+# ============================================
+# Copy this file to config.yaml and update values
+# All API keys should be stored in .env file, NOT here!
+
+# ============================================
+# TELEGRAM CONFIGURATION
+# ============================================
+telegram:
+  # Get these from https://my.telegram.org
+  # STORE IN .env FILE AS:
+  # TELEGRAM_API_ID=123456
+  # TELEGRAM_API_HASH=abcdef1234567890
+  api_id: ${TELEGRAM_API_ID}
+  api_hash: ${TELEGRAM_API_HASH}
+  
+  session_name: "wolf_trading_bot"
+  
+  public_channel:
+    username: "thewolfofcrypto1"
+    title: "THE WOLF (CRYPTO)"
+  
+  vip_channel:
+    title: "WOLF OFFICIAL VIP"
+  
+  connection:
+    retry_delay_seconds: 5
+    max_retries: 10
+    flood_sleep_threshold: 60
+
+# ============================================
+# SIGNAL SOURCE FILTERING
+# ============================================
+signal_sources:
+  enable_free_signals: true
+  enable_vip_signals: true
+
+# ============================================
+# PREMIUM SIGNAL CONFIGURATION
+# ============================================
+premium:
+  vip_forward_source_title: "WOLF OFFICIAL VIP"
+  require_photo: true
+  
+  known_platforms:
+    - name: "Bitunix Pro"
+      logo_text: "Bitunix Pro"
+      direction_patterns: ["Long", "Short"]
+      symbol_pattern: "([A-Z0-9]+USDT)\\s*[|｜]"
+      entry_price_pattern: "Entry\\s*Price\\s*([0-9.]+)"
+      last_price_pattern: "Last\\s*Price\\s*([0-9.]+)"
+
+# ============================================
+# OCR CONFIGURATION
+# ============================================
+ocr:
+  # Windows: Uncomment and set path to tesseract.exe
+  # tesseract_cmd: "C:/Program Files/Tesseract-OCR/tesseract.exe"
+  
+  preprocessing:
+    invert_colors: true
+    apply_clahe: true
+    apply_bilateral_filter: true
+
+# ============================================
+# TRADING CONFIGURATION
+# ============================================
+trading:
+  exchange: "bingx"
+  
+  # STORE IN .env FILE AS:
+  # BINGX_API_KEY=your_api_key
+  # BINGX_API_SECRET=your_api_secret
+  api_key_env: "BINGX_API_KEY"
+  api_secret_env: "BINGX_API_SECRET"
+  
+  # CRITICAL v4.1: Maximum trades per day to protect capital
+  max_trades_per_day: 5
+  
+  # STRICT: Only LIMIT orders - NO MARKET ORDERS
+  order_type: "LIMIT"
+  
+  default_leverage: 50
+  fallback_to_max_leverage: true
+  
+  tolerance:
+    price_tolerance_percent: 0.03    # 3% default
+    min_percent: 0.01                # 1% minimum
+    max_percent: 0.05                # 5% maximum
+    range_reference_method: "nearest_boundary"
+  
+  position:
+    mode: "fixed_notional"
+    fixed_notional_usdt: 1.0         # $1 default
+    max_notional_usdt: 10
+  
+  limit_order:
+    price_offset_percent: 0.001
+    fill_timeout_seconds: 10
+    # CRITICAL v4.1: unfilled orders are CANCELLED, never market
+    unfilled_action: "cancel"
+
+# ============================================
+# TP/SL STRATEGY (v4.1 - Separate for VIP/FREE)
+# ============================================
+tp_sl_strategy:
+  # FREE signals: Can use TP/SL from signal text/image or manual
+  free_signals:
+    mode: "from_signal"              # Options: "from_signal" or "manual"
+  
+  # VIP signals: ALWAYS use manual (no TP/SL in VIP images)
+  vip_signals:
+    mode: "manual"                   # STRICT: Always manual for VIP
+  
+  # Manual percentages (without leverage)
+  manual_defaults:
+    tp_percent: 10.0                 # Without leverage
+    sl_percent: 2.0                  # Without leverage
+    sl_max_percent: 5.0              # HARD CAP: 5% (250% at 50x)
+  
+  limits:
+    tp_min_percent: null
+    tp_max_percent: null
+    sl_min_percent: 0.5
+    sl_max_percent: 5.0              # HARD CAP
+
+# ============================================
+# LOGGING
+# ============================================
+logging:
+  level: "INFO"
+  console_level: "WARNING"
+  file_rotation: "daily"
+  max_files: 30
+
+# ============================================
+# ADMIN
+# ============================================
+admin:
+  override_public_channel_link: null
+  override_vip_channel_title: null
+  hot_reload_config: false
